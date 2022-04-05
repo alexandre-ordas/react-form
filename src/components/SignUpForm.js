@@ -1,5 +1,5 @@
 import React from "react";
-import { Formik } from "formik";
+import {ErrorMessage, Field, Formik} from "formik";
 
 const SignUpForm = () => (
     <Formik
@@ -17,24 +17,41 @@ const SignUpForm = () => (
             ){
                 errors.username = 'PLease enter a valid user name'
             }
+            if (!values.password) {
+                errors.password = 'Please enter a password'
+            } else if (!values.password.length <= 8 && values.password.match(/[a-z][a-z0-9_\-.]{2,15}/i)) {
+                errors.password = 'Your password need 8 caracteres to be valid'
+            }
+            if (!values.password === !values.passwordRepeat) {
+                errors.passwordRepeat = 'Please enter the same password'
+            }
             return errors
         }}
         onSubmit={values => console.log(values)}
         >
-        {({values, handleChange, handleSubmit, errors}) => (
+        {({ handleSubmit }) => (
+
             <form onSubmit={handleSubmit}>
                 <label htmlFor="">
                     User name:
-                    <input type="text" name="username" value={values.username} onChange={handleChange} />
-                    {errors.username && <span className="error">{errors.username}</span>}
+                    <Field type="text" name="username"/>
+                    <ErrorMessage
+                        name="username" className="error" component="span"
+                    />
                 </label>
                 <label htmlFor="">
                     Password :
-                    <input type="password" name="password"/>
+                    <Field type="password" name="password" />
+                    <ErrorMessage
+                        name="password" className="error" component="span"
+                    />
                 </label>
                 <label htmlFor="">
                     Password (repeat) :
-                    <input type="password" name="passwordRepeat"/>
+                    <Field type="password" name="passwordRepeat" />
+                    <ErrorMessage
+                        name="passwordRepeat" className="error" component="span"
+                    />
                 </label>
                 <button type="submit">Sign up</button>
             </form>
