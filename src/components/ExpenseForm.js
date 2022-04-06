@@ -7,7 +7,7 @@ class ExpenseForm extends Component {
         date: new Date()
             .toISOString()
             .split('T')
-            .shift(), // yyyy-mm-dd,
+            .shift(),
         amount: 0,
         notes: ''
     }
@@ -17,7 +17,9 @@ class ExpenseForm extends Component {
             errors.title = 'Please enter a title.'
         }
         if (!values.date) {
+
             errors.date = 'Please enter a date.'
+
         }
         if (!values.amount) {
             errors.amount = 'Please enter a non zero-amount.'
@@ -34,7 +36,7 @@ class ExpenseForm extends Component {
     render() {
         return (
             <Formik
-                initialValues={this.defaultValues}
+                initialValues={this.props.expense  || this.defaultValues}
                 validate={this.validate}
                 onSubmit={this.onSubmit}
             >
@@ -42,17 +44,23 @@ class ExpenseForm extends Component {
                     <form className="expense-form" onSubmit={handleSubmit}>
                         <label htmlFor="">
                             Title : <Field type="text" name="title" />
+                            {this.renderError('title')}
                         </label>
                         <label htmlFor="">
                             Date : <Field type="date" name="date" />
+                            {this.renderError('date')}
                         </label>
                         <label htmlFor="">
                             Amount (€) : <Field type="number" name="amount" />
+                            {this.renderError('amount')}
                         </label>
                         <label htmlFor="">
                             Notes : <Field component="textarea" name="notes" />
+                            {this.renderError('notes')}
                         </label>
-                        <button type="submit">Create</button>
+                        <button type="submit">
+                            {this.props.expense ? 'Update' : 'Create'}
+                        </button>
                     </form>
                 )}
             </Formik>

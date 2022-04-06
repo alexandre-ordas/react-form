@@ -35,14 +35,14 @@ class App extends Component {
         }
         return (
             <Fragment>
-                <h2>Expences</h2>
+                <h2>Expenses</h2>
                 <button onClick={this.showCreationForm}>Create</button>
                 {this.state.expenses.length > 0 ? (
                     <ul>
                         {this.state.expenses.map(expense => (
                             <li key={expense.id}>
                                 {expense.title} : {expense.amount} € spent on{' '}
-                                {new Date(expense.data) .toDateString()}
+                                {new Date(expense.date).toDateString()}
                             </li>
                         ))}
                     </ul>
