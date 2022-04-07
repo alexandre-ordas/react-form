@@ -1,17 +1,19 @@
 import React, {Component, Fragment} from "react";
 import SignUpForm from './SignUpForm'
 import ExpenseForm from "./ExpenseForm";
+import {
+    BrowserRouter as Router,
+    Route,
+    Link,
+    Routes,
+    useNavigate, useParams
+} from "react-router-dom";
+
 
 class App extends Component {
     state = {
         expenses: [],
-        nextExpenseId: 0,
-        isCreatingExpense: false,
-        currentlyEditedExpense: null
-    }
-
-    showCreationForm = () => {
-        this.setState({ isCreatingExpense: true})
+        nextExpenseId: 0
     }
 
     createExpense = expenseInfos => {
@@ -21,13 +23,9 @@ class App extends Component {
                 ...this.state.expenses
             ],
             nextExpenseId: this.state.nextExpenseId + 1,
-            isCreatingExpense: false
         })
     }
 
-    showEditionForm = expense => {
-        this.setState({currentlyEditedExpense: expense})
-    }
     updateExpense = expenseInfos => {
         const { expenses } = this.state
         const expenseIndex = expenses.findIndex(e => e.id === expenseInfos.id )
@@ -38,34 +36,52 @@ class App extends Component {
                 ...expensesBefore,
                 expenseInfos,
                 ...expensesAfter
-            ],
-            currentlyEditedExpense: null
+            ]
         })
     }
 
-    renderCreateExpenseForm = () => {
+    renderCreateExpenseForm = ({ history }) => {
+        let navigate = useNavigate()
         return(
             <Fragment>
                 <Fragment>
-                    <h2>Edit expense</h2>
+                    <h2>Create a new expense</h2>
                     <ExpenseForm
-                        onSubmit={this.createExpense()}
-                        onCance={this.onCreateExpenseCancel}
+                        onSubmit={expenseInfos => {
+                            this.createExpense(expenseInfos)
+                            navigate('/')
+                        }}
+                        onCancel={() => { navigate('/')}}
                     />
                 </Fragment>
             </Fragment>
         )
     }
 
-    renderEditExpenseForm = () => {
-        const expense = this.state.currentlyEditedExpense
+    renderEditExpenseForm = ({match}) => {
+        let navigate = useNavigate()
+        const { id } = useParams();
+        const expense = this.state.expenses.find(e => e.id === Number(id))
+        if (!expense) {
+            return (
+                <Fragment>
+                    <p>No expense with this ID.</p>
+                    <Link to="/" className="button primary">Go back to expense list</Link>
+                </Fragment>
+            )
+        }
         return (
             <Fragment>
                 <h2>Edit expense</h2>
                 <ExpenseForm
                     expense={expense}
-                    onSubmit={this.updateExpense}
-                    onCancel={this.onUpdateExpenseCancel}
+                    onSubmit={ expenseInfos => {
+                        this.updateExpense(expenseInfos)
+                        navigate('/')
+                    }}
+                    onCancel={ () => {
+                        navigate('/')
+                    }}
                 />
             </Fragment>
         )
@@ -75,16 +91,16 @@ class App extends Component {
         return (
             <Fragment>
                 <h2>Expenses</h2>
-                <button
-                    className="primary"
-                    onClick={this.showCreationForm}>
-                    Create
-                </button>
+                    <Link to="/create" className="button primary">
+                        Create
+                    </Link>
                 {this.state.expenses.length > 0 ? (
                     <ul>
                         {this.state.expenses.map(expense => (
                             <li key={expense.id}>
-                                <button onClick={ () => this.showEditionForm(expense)}>Edit</button>
+                                    <Link to={`/${expense.id}`} className="button">
+                                        Edit
+                                    </Link>
                                 {expense.title} : {expense.amount} € spent on{' '}
                                 {new Date(expense.date).toDateString()}
                             </li>
@@ -95,17 +111,31 @@ class App extends Component {
                 )}
             </Fragment>
         )
-        //return <SignUpForm/>
+    }
+
+    renderNotFound = () => {
+        return (
+            <Fragment>
+                <p>Nothing here ...</p>
+                <Link to="/" className="button">
+                    Go back to expense list
+                </Link>
+            </Fragment>
+        )
     }
 
     render() {
-        if (this.state.isCreatingExpense) {
-            return this.renderCreateExpenseForm()
-        }
-        if (this.state.currentlyEditedExpense) {
-            return this.renderEditExpenseForm()
-        }
-        return this.renderExpensesList()
+        return (
+            <Router>
+                <Routes>
+                    <Route path="/" element={<this.renderExpensesList/>} />
+                    <Route path="/create" element={<this.renderCreateExpenseForm/>} />
+                    <Route path="/:id" element={<this.renderEditExpenseForm/>} />
+                    <Route element={<this.renderNotFound/>}/>
+
+                </Routes>
+            </Router>
+        )
     }
 }
 

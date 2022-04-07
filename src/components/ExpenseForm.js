@@ -29,6 +29,10 @@ class ExpenseForm extends Component {
     onSubmit = expense => {
         this.props.onSubmit(expense)
     }
+    onCancel = event => {
+        event.preventDefault()
+        this.props.onCancel()
+    }
 
     renderError(name) {
         return <ErrorMessage name={name} component="span" className="error" />
@@ -58,7 +62,8 @@ class ExpenseForm extends Component {
                             Notes : <Field component="textarea" name="notes" />
                             {this.renderError('notes')}
                         </label>
-                        <button type="submit">
+                        <button onClick={this.onCancel}>Cancel</button>
+                        <button className="primary" type="submit">
                             {this.props.expense ? 'Update' : 'Create'}
                         </button>
                     </form>
