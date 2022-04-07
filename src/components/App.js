@@ -43,30 +43,43 @@ class App extends Component {
         })
     }
 
-    render() {
-        if (this.state.currentlyEditedExpense) {
-            return(
+    renderCreateExpenseForm = () => {
+        return(
+            <Fragment>
                 <Fragment>
                     <h2>Edit expense</h2>
                     <ExpenseForm
-                        expense={this.state.currentlyEditedExpense}
-                        onSubmit={this.updateExpense}
+                        onSubmit={this.createExpense()}
+                        onCance={this.onCreateExpenseCancel}
                     />
                 </Fragment>
-            )
-        }
-        if (this.state.isCreatingExpense) {
-            return (
-                <Fragment>
-                    <h2>Create a new expense</h2>
-                    <ExpenseForm onSubmit={this.createExpense} />
-                </Fragment>
-            )
-        }
+            </Fragment>
+        )
+    }
+
+    renderEditExpenseForm = () => {
+        const expense = this.state.currentlyEditedExpense
+        return (
+            <Fragment>
+                <h2>Edit expense</h2>
+                <ExpenseForm
+                    expense={expense}
+                    onSubmit={this.updateExpense}
+                    onCancel={this.onUpdateExpenseCancel}
+                />
+            </Fragment>
+        )
+    }
+
+    renderExpensesList = () => {
         return (
             <Fragment>
                 <h2>Expenses</h2>
-                <button onClick={this.showCreationForm}>Create</button>
+                <button
+                    className="primary"
+                    onClick={this.showCreationForm}>
+                    Create
+                </button>
                 {this.state.expenses.length > 0 ? (
                     <ul>
                         {this.state.expenses.map(expense => (
@@ -82,8 +95,17 @@ class App extends Component {
                 )}
             </Fragment>
         )
-
         //return <SignUpForm/>
+    }
+
+    render() {
+        if (this.state.isCreatingExpense) {
+            return this.renderCreateExpenseForm()
+        }
+        if (this.state.currentlyEditedExpense) {
+            return this.renderEditExpenseForm()
+        }
+        return this.renderExpensesList()
     }
 }
 
