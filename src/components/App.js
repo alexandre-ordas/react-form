@@ -16,6 +16,10 @@ class App extends Component {
         nextExpenseId: 0
     }
 
+    componentDidMount() {
+        this.loadStateFromLocalStorage()
+    }
+
     createExpense = expenseInfos => {
         this.setState({
             expenses: [
@@ -23,7 +27,10 @@ class App extends Component {
                 ...this.state.expenses
             ],
             nextExpenseId: this.state.nextExpenseId + 1,
-        })
+        },
+            this.saveStateToLocalStorage
+            )
+
     }
 
     updateExpense = expenseInfos => {
@@ -37,7 +44,21 @@ class App extends Component {
                 expenseInfos,
                 ...expensesAfter
             ]
-        })
+        },
+            this.saveStateToLocalStorage
+        )
+
+    }
+
+    saveStateToLocalStorage = () => {
+        window.localStorage.setItem('state', JSON.stringify(this.state))
+    }
+
+    loadStateFromLocalStorage = () => {
+        const stateJSON = window.localStorage.getItem('state')
+        if (stateJSON) {
+            this.setState(JSON.parse(stateJSON))
+        }
     }
 
     renderCreateExpenseForm = ({ history }) => {
